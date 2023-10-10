@@ -3,24 +3,28 @@ Open-Closed Principle
 
 Classes devem estar fechadas para modificação, mas abertas para extensão
 """
-class Animal:
-    def __init__(self, name: str):
-        self.name = name
+
+from abc import ABC, abstractmethod
+
+class Animal(ABC):
     
-    def get_name(self) -> str:
+    @abstractmethod
+    def make_sound(self):
         pass
 
+class Lion(Animal):
+
     def make_sound(self):
-        if self.name == 'lion':
-            print('roar')
-        elif self.name == 'mouse':
-            print('squeak')
-        else:
-            print('...')
+        print('roar')
+
+class Mouse(Animal):
+
+    def make_sound(self):
+        print('squeak')
 
 animals = [
-    Animal('lion'),
-    Animal('mouse')
+    Lion(),
+    Mouse()
 ]
 
 def animal_sound(animals: list):
@@ -28,7 +32,6 @@ def animal_sound(animals: list):
         animal.make_sound()
 
 animal_sound(animals)
-
 
 """
 Outro exemplo:
@@ -38,14 +41,29 @@ usando essa classe abaixo. Quando você decide dar 40% de desconto a clientes VI
 você decide mudar a classe da seguinte forma:
 """
 
+class Customer(ABC):
+
+    def __init__(self, discount) -> None:
+        self.__discount = discount
+    
+    @property
+    def discount(self):
+        return self.__discount
+    
+class CustomerVIP(Customer):
+
+    def __init__(self) -> None:
+        super().__init__(0.4)
+
+class CustomerFAV(Customer):
+
+    def __init__(self, discount) -> None:
+        super().__init__(0.2)
+    
 class Discount:
-    def __init__(self, customer, price):
+    def __init__(self, customer: Customer, price: float):
         self.customer = customer
         self.price = price
 
     def give_discount(self):
-            if self.customer == 'fav':
-                return self.price * 0.2
-            if self.customer == 'vip':
-                return self.price * 0.4
-
+        return self.price * self.customer.discount
